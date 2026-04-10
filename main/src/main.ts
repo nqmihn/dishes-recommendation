@@ -23,7 +23,7 @@ async function bootstrap() {
   app.useGlobalPipes(setupValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter());
   app.enableVersioning();
-  await setupRabbitMQ(app);
+  // await setupRabbitMQ(app);
   await setupSwagger(app);
   setupInjector(app);
 

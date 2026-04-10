@@ -1,0 +1,389 @@
+.detail-page {
+  padding-bottom: 2rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #78716c;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #ea580c;
+}
+
+/* ========== Layout ========== */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* ========== Gallery ========== */
+.detail-gallery {
+  position: sticky;
+  top: 80px;
+}
+
+.detail-main-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f5f5f4;
+}
+
+.detail-main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #1c1917;
+}
+
+.gallery-nav:hover {
+  background: white;
+}
+
+.gallery-nav--prev {
+  left: 12px;
+}
+
+.gallery-nav--next {
+  right: 12px;
+}
+
+.detail-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.detail-thumbnails {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.detail-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+  background: none;
+}
+
+.detail-thumb.active {
+  border-color: #f97316;
+}
+
+.detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========== Info ========== */
+.detail-info {
+  padding: 0;
+}
+
+.detail-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1c1917;
+  margin: 0 0 0.5rem;
+  line-height: 1.3;
+}
+
+.detail-short-desc {
+  font-size: 1rem;
+  color: #78716c;
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.detail-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ea580c;
+  margin-bottom: 1.25rem;
+}
+
+.detail-meta {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.detail-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #78716c;
+}
+
+.detail-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  color: #a8a29e;
+}
+
+.detail-tag {
+  background: #fff7ed;
+  color: #ea580c;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ========== Sections ========== */
+.detail-section {
+  border-top: 1px solid #f5f5f4;
+  padding-top: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.detail-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1c1917;
+  margin: 0 0 0.75rem;
+}
+
+.detail-description {
+  font-size: 0.95rem;
+  color: #44403c;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* ========== Variants ========== */
+.detail-variants {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-variant-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid #e7e5e4;
+  border-radius: 10px;
+  background: white;
+}
+
+.detail-variant-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.variant-default-badge {
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.detail-variant-prices {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-variant-price {
+  font-weight: 600;
+  color: #ea580c;
+  font-size: 0.95rem;
+}
+
+.detail-variant-original {
+  text-decoration: line-through;
+  color: #a8a29e;
+  font-size: 0.85rem;
+}
+
+.detail-variant-sku {
+  font-size: 0.75rem;
+  color: #a8a29e;
+  width: 100%;
+}
+
+/* ========== Option Groups ========== */
+.detail-option-group {
+  margin-bottom: 1rem;
+}
+
+.detail-option-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.detail-option-group-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.option-required-badge {
+  background: #fef2f2;
+  color: #ef4444;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.option-selections {
+  font-size: 0.8rem;
+  color: #a8a29e;
+}
+
+.detail-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-option-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: #fafaf9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.detail-option-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.option-default-dot {
+  width: 6px;
+  height: 6px;
+  background: #16a34a;
+  border-radius: 50%;
+}
+
+.detail-option-price {
+  color: #ea580c;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* ========== Skeleton ========== */
+.detail-skeleton {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+}
+
+.detail-skeleton-image {
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #f5f5f4 25%, #e7e5e4 50%, #f5f5f4 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.detail-skeleton-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-skeleton-info .skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f5f5f4 25%, #e7e5e4 50%, #f5f5f4 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ========== Error ========== */
+.detail-error {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #78716c;
+}
+
+.detail-error p {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .detail-gallery {
+    position: static;
+  }
+
+  .detail-skeleton {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-name {
+    font-size: 1.4rem;
+  }
+}

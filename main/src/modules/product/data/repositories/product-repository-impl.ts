@@ -32,6 +32,10 @@ export class ProductRepositoryImpl extends ProductRepository {
     return await this.productDatasource.findProductById(id);
   }
 
+  public async findManyByIds(ids: string[]): Promise<ProductModel[]> {
+    return await this.productDatasource.findProductsByIds(ids);
+  }
+
   public async findByIdWithRelations(id: string): Promise<ProductModel | undefined> {
     return await this.productDatasource.findProductByIdWithRelations(id);
   }

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, Res } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { normalizeResponseData } from 'src/core/helpers/utils';
 import { PageParams } from 'src/core/models/page-params';
@@ -46,6 +46,87 @@ import {
   UpdateProductOptionDto,
 } from '../dtos/product-dto';
 
+const EXAMPLE_PRODUCT = {
+  id: '01960000-0000-7000-0000-000000000001',
+  category_id: '01960000-0000-7000-0000-000000000010',
+  name: 'Phở Bò Đặc Biệt',
+  slug: 'pho-bo-dac-biet',
+  description: 'Phở bò với nước dùng hầm 12 tiếng, thịt bò tươi mềm.',
+  short_description: 'Phở bò nước dùng đậm đà',
+  base_price: 75000,
+  thumbnail_url: 'https://example.com/images/pho-bo.jpg',
+  is_active: true,
+  is_featured: true,
+  preparation_time: 10,
+  calories: 450,
+  tags: ['beef', 'noodle', 'hot'],
+  sort_order: 1,
+  created_at: '2026-04-10T10:00:00.000Z',
+  updated_at: '2026-04-10T10:00:00.000Z',
+  variants: [
+    {
+      id: '01960000-0000-7000-0000-000000000002',
+      product_id: '01960000-0000-7000-0000-000000000001',
+      name: 'Tô lớn',
+      sku: 'PHO-BO-L',
+      price: 85000,
+      original_price: 95000,
+      stock_quantity: -1,
+      is_default: false,
+      is_active: true,
+      sort_order: 1,
+      created_at: '2026-04-10T10:00:00.000Z',
+      updated_at: '2026-04-10T10:00:00.000Z',
+    },
+  ],
+  images: [
+    {
+      id: '01960000-0000-7000-0000-000000000003',
+      product_id: '01960000-0000-7000-0000-000000000001',
+      image_url: 'https://example.com/images/pho-bo-full.jpg',
+      alt_text: 'Phở bò đặc biệt',
+      sort_order: 0,
+      created_at: '2026-04-10T10:00:00.000Z',
+    },
+  ],
+  option_groups: [
+    {
+      id: '01960000-0000-7000-0000-000000000004',
+      product_id: '01960000-0000-7000-0000-000000000001',
+      name: 'Độ chín',
+      is_required: true,
+      min_selections: 1,
+      max_selections: 1,
+      sort_order: 0,
+      options: [
+        {
+          id: '01960000-0000-7000-0000-000000000005',
+          option_group_id: '01960000-0000-7000-0000-000000000004',
+          name: 'Tái',
+          additional_price: 0,
+          is_default: true,
+          is_active: true,
+          sort_order: 0,
+        },
+        {
+          id: '01960000-0000-7000-0000-000000000006',
+          option_group_id: '01960000-0000-7000-0000-000000000004',
+          name: 'Chín',
+          additional_price: 0,
+          is_default: false,
+          is_active: true,
+          sort_order: 1,
+        },
+      ],
+    },
+  ],
+};
+
+const EXAMPLE_VARIANT = EXAMPLE_PRODUCT.variants[0];
+const EXAMPLE_IMAGE = EXAMPLE_PRODUCT.images[0];
+const EXAMPLE_OPTION_GROUP = EXAMPLE_PRODUCT.option_groups[0];
+const EXAMPLE_OPTION = EXAMPLE_PRODUCT.option_groups[0].options[0];
+
 @ApiTags('Products')
 @ApiBearerAuth()
 @Controller({ path: 'api/v1/products' })
@@ -71,7 +152,12 @@ export class ProductController {
 
   // ===================== PRODUCT CRUD =====================
 
-  @ApiResponse({ status: HttpStatus.CREATED, type: ProductModel })
+  @ApiOperation({ summary: 'Tạo sản phẩm mới' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Sản phẩm vừa được tạo',
+    schema: { example: EXAMPLE_PRODUCT },
+  })
   @Post()
   async create(@Body() body: CreateProductDto, @Res() res: Response) {
     const product = await this.createProductUsecase.call(
@@ -92,7 +178,14 @@ export class ProductController {
     res.status(HttpStatus.CREATED).json(normalizeResponseData(product));
   }
 
-  @ApiResponse({ status: HttpStatus.OK, type: ProductModel })
+  @ApiOperation({ summary: 'Cập nhật sản phẩm' })
+  @ApiParam({ name: 'id', description: 'ID của sản phẩm' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Sản phẩm sau khi cập nhật',
+    schema: { example: EXAMPLE_PRODUCT },
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, schema: { example: { message: 'Product not found.' } } })
   @Put(':id')
   async update(@Param('id') id: string, @Body() body: UpdateProductDto, @Res() res: Response) {
     const product = await this.updateProductUsecase.call(
@@ -114,14 +207,32 @@ export class ProductController {
     res.status(HttpStatus.OK).json(normalizeResponseData(product));
   }
 
-  @ApiResponse({ status: HttpStatus.OK, type: ProductModel })
+  @ApiOperation({ summary: 'Lấy chi tiết sản phẩm kèm variants, images, option groups' })
+  @ApiParam({ name: 'id', description: 'ID của sản phẩm' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Chi tiết sản phẩm',
+    schema: { example: EXAMPLE_PRODUCT },
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, schema: { example: { message: 'Product not found.' } } })
   @Get(':id')
   async get(@Param('id') id: string, @Res() res: Response) {
     const product = await this.getProductUsecase.call(id);
     res.status(HttpStatus.OK).json(normalizeResponseData(product));
   }
 
-  @ApiResponse({ status: HttpStatus.OK, type: ProductModel, isArray: true })
+  @ApiOperation({ summary: 'Danh sách sản phẩm có phân trang, lọc, tìm kiếm' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Danh sách sản phẩm',
+    schema: {
+      example: {
+        page: 1,
+        total_count: 100,
+        data: [EXAMPLE_PRODUCT],
+      },
+    },
+  })
   @Get()
   async list(@Query() query: ListProductQueryDto, @Res() res: Response) {
     const pageParams = new PageParams(query.page, query.limit, query.need_total_count, query.only_count);
@@ -142,7 +253,10 @@ export class ProductController {
     });
   }
 
-  @ApiResponse({ status: HttpStatus.OK })
+  @ApiOperation({ summary: 'Xóa sản phẩm' })
+  @ApiParam({ name: 'id', description: 'ID của sản phẩm' })
+  @ApiResponse({ status: HttpStatus.OK, schema: { example: { message: 'Product deleted successfully.' } } })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, schema: { example: { message: 'Product not found.' } } })
   @Delete(':id')
   async delete(@Param('id') id: string, @Res() res: Response) {
     await this.deleteProductUsecase.call(id);
@@ -152,6 +266,13 @@ export class ProductController {
   // ===================== VARIANTS =====================
 
   @ApiTags('Product Variants')
+  @ApiOperation({ summary: 'Thêm variant cho sản phẩm' })
+  @ApiParam({ name: 'productId', description: 'ID của sản phẩm' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Variant vừa được tạo',
+    schema: { example: EXAMPLE_VARIANT },
+  })
   @Post(':productId/variants')
   async createVariant(
     @Param('productId') productId: string,
@@ -173,6 +294,13 @@ export class ProductController {
   }
 
   @ApiTags('Product Variants')
+  @ApiOperation({ summary: 'Cập nhật variant' })
+  @ApiParam({ name: 'id', description: 'ID của variant' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Variant sau khi cập nhật',
+    schema: { example: EXAMPLE_VARIANT },
+  })
   @Put('variants/:id')
   async updateVariant(@Param('id') id: string, @Body() body: UpdateProductVariantDto, @Res() res: Response) {
     const variant = await this.updateProductVariantUsecase.call(
@@ -190,6 +318,9 @@ export class ProductController {
   }
 
   @ApiTags('Product Variants')
+  @ApiOperation({ summary: 'Xóa variant' })
+  @ApiParam({ name: 'id', description: 'ID của variant' })
+  @ApiResponse({ status: HttpStatus.OK, schema: { example: { message: 'Variant deleted successfully.' } } })
   @Delete('variants/:id')
   async deleteVariant(@Param('id') id: string, @Res() res: Response) {
     await this.deleteProductVariantUsecase.call(id);
@@ -199,6 +330,13 @@ export class ProductController {
   // ===================== IMAGES =====================
 
   @ApiTags('Product Images')
+  @ApiOperation({ summary: 'Thêm ảnh cho sản phẩm' })
+  @ApiParam({ name: 'productId', description: 'ID của sản phẩm' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Ảnh vừa được thêm',
+    schema: { example: EXAMPLE_IMAGE },
+  })
   @Post(':productId/images')
   async createImage(
     @Param('productId') productId: string,
@@ -215,6 +353,9 @@ export class ProductController {
   }
 
   @ApiTags('Product Images')
+  @ApiOperation({ summary: 'Xóa ảnh sản phẩm' })
+  @ApiParam({ name: 'id', description: 'ID của ảnh' })
+  @ApiResponse({ status: HttpStatus.OK, schema: { example: { message: 'Image deleted successfully.' } } })
   @Delete('images/:id')
   async deleteImage(@Param('id') id: string, @Res() res: Response) {
     await this.deleteProductImageUsecase.call(id);
@@ -224,6 +365,13 @@ export class ProductController {
   // ===================== OPTION GROUPS =====================
 
   @ApiTags('Product Options')
+  @ApiOperation({ summary: 'Tạo option group cho sản phẩm (ví dụ: Độ chín, Size)' })
+  @ApiParam({ name: 'productId', description: 'ID của sản phẩm' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Option group vừa được tạo',
+    schema: { example: EXAMPLE_OPTION_GROUP },
+  })
   @Post(':productId/option-groups')
   async createOptionGroup(
     @Param('productId') productId: string,
@@ -242,6 +390,13 @@ export class ProductController {
   }
 
   @ApiTags('Product Options')
+  @ApiOperation({ summary: 'Cập nhật option group' })
+  @ApiParam({ name: 'id', description: 'ID của option group' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Option group sau khi cập nhật',
+    schema: { example: EXAMPLE_OPTION_GROUP },
+  })
   @Put('option-groups/:id')
   async updateOptionGroup(
     @Param('id') id: string,
@@ -260,6 +415,9 @@ export class ProductController {
   }
 
   @ApiTags('Product Options')
+  @ApiOperation({ summary: 'Xóa option group' })
+  @ApiParam({ name: 'id', description: 'ID của option group' })
+  @ApiResponse({ status: HttpStatus.OK, schema: { example: { message: 'Option group deleted successfully.' } } })
   @Delete('option-groups/:id')
   async deleteOptionGroup(@Param('id') id: string, @Res() res: Response) {
     await this.deleteProductOptionGroupUsecase.call(id);
@@ -269,6 +427,13 @@ export class ProductController {
   // ===================== OPTIONS =====================
 
   @ApiTags('Product Options')
+  @ApiOperation({ summary: 'Thêm option vào option group (ví dụ: Tái, Chín, Size M/L/XL)' })
+  @ApiParam({ name: 'groupId', description: 'ID của option group' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Option vừa được tạo',
+    schema: { example: EXAMPLE_OPTION },
+  })
   @Post('option-groups/:groupId/options')
   async createOption(
     @Param('groupId') groupId: string,
@@ -287,6 +452,13 @@ export class ProductController {
   }
 
   @ApiTags('Product Options')
+  @ApiOperation({ summary: 'Cập nhật option' })
+  @ApiParam({ name: 'id', description: 'ID của option' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Option sau khi cập nhật',
+    schema: { example: EXAMPLE_OPTION },
+  })
   @Put('options/:id')
   async updateOption(@Param('id') id: string, @Body() body: UpdateProductOptionDto, @Res() res: Response) {
     const option = await this.updateProductOptionUsecase.call(
@@ -301,9 +473,13 @@ export class ProductController {
   }
 
   @ApiTags('Product Options')
+  @ApiOperation({ summary: 'Xóa option' })
+  @ApiParam({ name: 'id', description: 'ID của option' })
+  @ApiResponse({ status: HttpStatus.OK, schema: { example: { message: 'Option deleted successfully.' } } })
   @Delete('options/:id')
   async deleteOption(@Param('id') id: string, @Res() res: Response) {
     await this.deleteProductOptionUsecase.call(id);
     res.status(HttpStatus.OK).json({ message: 'Option deleted successfully.' });
   }
 }
+

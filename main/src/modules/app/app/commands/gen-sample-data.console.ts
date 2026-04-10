@@ -9,7 +9,7 @@ import {
   CreateProductVariantInput,
 } from 'src/modules/product/domain/usecases/product/bulk-create-products-usecase';
 import { CategoryModel } from 'src/modules/category/domain/models/category-model';
-
+import { Transactional } from 'typeorm-transactional';
 @Console()
 export class GenSampleDataConsole {
   constructor(
@@ -21,6 +21,7 @@ export class GenSampleDataConsole {
     command: 'gen:sample-data',
     description: 'Generate sample data for categories and products',
   })
+  @Transactional()
   async handle(): Promise<void> {
     console.log('🚀 Starting sample data generation...\n');
 

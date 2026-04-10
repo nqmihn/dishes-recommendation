@@ -9,5 +9,6 @@ export default registerAs('rabbitmq', () => {
     vhost: process.env.RABBITMQ_VHOST,
     queue_name: process.env.RABBITMQ_QUEUE_NAME, 
     queue_option_durable: process.env.RABBITMQ_QUEUE_OPTION_DURABLE || true,
+    ai_queue_name: process.env.RABBITMQ_AI_QUEUE_NAME || 'ai-product-queue',
   };
 });

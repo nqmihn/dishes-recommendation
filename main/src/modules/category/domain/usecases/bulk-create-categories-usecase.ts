@@ -3,8 +3,7 @@ import { CategoryRepository } from '../repositories/category-repository';
 import { CategoryModel } from '../models/category-model';
 import { LogicalException } from 'src/exceptions/logical-exception';
 import { ErrorCode } from 'src/exceptions/error-code';
-import crypto from 'crypto';
-
+import {v7 as uuidv7} from 'uuid';
 export interface CreateCategoryInput {
   name: string;
   slug: string;
@@ -66,7 +65,7 @@ export class BulkCreateCategoriesUsecase {
     const categories = inputs.map(
       (input) =>
         new CategoryModel(
-          crypto.randomUUID(),
+          uuidv7(),
           input.name,
           input.slug,
           input.description,

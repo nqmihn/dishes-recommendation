@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    // Type Checking
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    // Modules
+    "module": "commonjs",
+    "baseUrl": "./",
+    // Emit
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "outDir": "./dist",
+    // Interop Constraints
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": false,
+    // Language and Environment
+    "experimentalDecorators": true,
+    "target": "es2023",
+    // Project
+    "incremental": true,
+    // Completeness
+    "skipLibCheck": true
+  }
+}

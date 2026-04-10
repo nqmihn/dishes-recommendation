@@ -99,6 +99,12 @@ export class ProductDatasource {
     return entity?.toModel();
   }
 
+  public async findProductsByIds(ids: string[]): Promise<ProductModel[]> {
+    if (ids.length === 0) return [];
+    const entities = await this.productRepo.find({ where: { id: In(ids) } });
+    return entities.map((e) => e.toModel());
+  }
+
   public async findProductBySlug(slug: string): Promise<ProductModel | undefined> {
     const entity = await this.productRepo.findOne({ where: { slug } });
     return entity?.toModel();

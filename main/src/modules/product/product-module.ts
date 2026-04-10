@@ -1,5 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ProductEntity } from './data/entities/product-entity';
 import { ProductVariantEntity } from './data/entities/product-variant-entity';
 import { ProductImageEntity } from './data/entities/product-image-entity';
@@ -58,6 +60,7 @@ import { BulkCreateProductsUsecase } from './domain/usecases/product/bulk-create
 import { ProductController } from './app/http/controllers/product-controller';
 import { CategoryModule } from '../category/category-module';
 import { SearchModule } from '../search/search-module';
+import { ProductEventProducer, AI_QUEUE_CLIENT } from './domain/services/product-event-producer';
 
 @Module({
   imports: [
@@ -67,6 +70,26 @@ import { SearchModule } from '../search/search-module';
       ProductImageEntity,
       ProductOptionGroupEntity,
       ProductOptionEntity,
+    ]),
+    ConfigModule,
+    ClientsModule.registerAsync([
+      {
+        name: AI_QUEUE_CLIENT,
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [
+              `amqp://${configService.get('rabbitmq.user')}:${configService.get('rabbitmq.password')}@${configService.get('rabbitmq.host')}:${configService.get('rabbitmq.port')}/${configService.get('rabbitmq.vhost')}`,
+            ],
+            queue: configService.get('rabbitmq.ai_queue_name') || 'ai-product-queue',
+            queueOptions: {
+              durable: true,
+            },
+          },
+        }),
+      },
     ]),
     CategoryModule,
     forwardRef(() => SearchModule),
@@ -109,6 +132,9 @@ import { SearchModule } from '../search/search-module';
     DeleteProductUsecase,
     ImportAllProductSearchDocumentsUseCase,
     BulkCreateProductsUsecase,
+
+    // Services
+    ProductEventProducer,
 
     // Variant usecases
     CreateProductVariantUsecase,

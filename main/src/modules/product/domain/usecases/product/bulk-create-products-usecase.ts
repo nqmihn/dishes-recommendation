@@ -11,9 +11,10 @@ import { ProductOptionGroupModel } from '../../models/product-option-group-model
 import { ProductOptionModel } from '../../models/product-option-model';
 import { CategoryRepository } from 'src/modules/category/domain/repositories/category-repository';
 import { UpdateSearchDocumentsUsecase } from 'src/modules/search/domain/usecases/update-search-documents-usecase';
+import { ProductEventProducer } from '../../services/product-event-producer';
 import { LogicalException } from 'src/exceptions/logical-exception';
 import { ErrorCode } from 'src/exceptions/error-code';
-import crypto from 'crypto';
+import {v7 as uuidv7} from 'uuid';
 
 export interface CreateProductOptionInput {
   name: string;
@@ -86,6 +87,7 @@ export class BulkCreateProductsUsecase {
     private readonly optionRepository: ProductOptionRepository,
     private readonly categoryRepository: CategoryRepository,
     private readonly updateSearchDocumentsUsecase: UpdateSearchDocumentsUsecase,
+    private readonly productEventProducer: ProductEventProducer,
   ) {}
 
   public async call(inputs: CreateProductInput[]): Promise<CreatedProductResult[]> {
@@ -203,7 +205,7 @@ export class BulkCreateProductsUsecase {
         const groupOptions = groupInput.options.map(
           (opt) =>
             new ProductOptionModel(
-              crypto.randomUUID(),
+              uuidv7(),
               groupId,
               opt.name,
               opt.additionalPrice,
@@ -232,6 +234,17 @@ export class BulkCreateProductsUsecase {
 
     // ── Index all created products in search engine in one call ──────────
     await this.updateSearchDocumentsUsecase.call(allProducts);
+
+    // ── Emit product.created events to AI queue ─────────────────────────
+    const categoryMap = new Map<string, string>();
+    categoryIds.forEach((id, idx) => {
+      const cat = categoryChecks[idx];
+      if (cat) categoryMap.set(id, cat.name);
+    });
+
+    for (const product of allProducts) {
+      await this.productEventProducer.emitProductCreated(product, categoryMap.get(product.categoryId));
+    }
 
     return resultMap;
   }

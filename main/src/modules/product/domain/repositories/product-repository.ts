@@ -9,6 +9,7 @@ export abstract class ProductRepository {
   public abstract createMany(products: ProductModel[]): Promise<ProductModel[]>;
   public abstract update(product: ProductModel): Promise<ProductModel>;
   public abstract findById(id: string): Promise<ProductModel | undefined>;
+  public abstract findManyByIds(ids: string[]): Promise<ProductModel[]>;
   public abstract findByIdWithRelations(id: string): Promise<ProductModel | undefined>;
   public abstract findBySlug(slug: string): Promise<ProductModel | undefined>;
   public abstract list(

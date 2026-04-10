@@ -5,6 +5,7 @@ import { LogicalException } from 'src/exceptions/logical-exception';
 import { ErrorCode } from 'src/exceptions/error-code';
 import { CategoryRepository } from 'src/modules/category/domain/repositories/category-repository';
 import { UpdateSearchDocumentsUsecase } from 'src/modules/search/domain/usecases/update-search-documents-usecase';
+import { ProductEventProducer } from '../../services/product-event-producer';
 import crypto from 'crypto';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class CreateProductUsecase {
     private readonly productRepository: ProductRepository,
     private readonly categoryRepository: CategoryRepository,
     private readonly updateSearchDocumentsUsecase: UpdateSearchDocumentsUsecase,
+    private readonly productEventProducer: ProductEventProducer,
   ) {}
 
   public async call(
@@ -64,6 +66,8 @@ export class CreateProductUsecase {
 
     return await this.productRepository.create(product).then(async (created) => {
       await this.updateSearchDocumentsUsecase.call([created]);
+      // Emit to AI queue for document generation
+      await this.productEventProducer.emitProductCreated(created, category.name);
       return created;
     });
   }

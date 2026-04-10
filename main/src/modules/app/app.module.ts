@@ -16,6 +16,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis, { Keyv } from '@keyv/redis';
 import { CategoryModule } from '../category/category-module';
 import { ProductModule } from '../product/product-module';
+import { ChatModule } from '../chat/chat-module';
 import database from './config/database';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
@@ -89,6 +90,7 @@ import { GenSampleDataConsole } from './app/commands/gen-sample-data.console';
     ScheduleModule.forRoot(),
     CategoryModule,
     ProductModule,
+    ChatModule,
   ],
   controllers: [AppController, ProxyConsumer],
   providers: [
