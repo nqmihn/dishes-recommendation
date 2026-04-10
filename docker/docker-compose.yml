@@ -1,0 +1,69 @@
+services:
+  main:
+    image: ${COMPOSE_PROJECT_NAME}/main:${NODE_VERSION}-alpine
+    build: services/main
+    command: >
+      /bin/sh -c "npm install &&
+                  npm run build &&
+                  npm run migrate:run &&
+                  npm run start:dev"
+    restart: on-failure
+    ports:
+      - '${MAIN_PORT}:80'
+    volumes:
+      - ../main:/var/www
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    
+  redis:
+    image: redis:8.2.0-alpine
+    restart: on-failure
+    volumes:
+      - redis:/data
+  postgres:
+    image: postgres:17-alpine
+    command: [ 'postgres', '-c', 'config_file=/etc/postgresql.conf' ]
+    restart: on-failure
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    volumes:
+      - ./services/postgres/initdb:/docker-entrypoint-initdb.d
+      - postgres:/var/lib/postgresql/data
+      - ./services/postgres/conf/postgresql.conf:/etc/postgresql.conf
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_MULTIPLE_DATABASES}
+      - POSTGRES_EXTENSIONS=${POSTGRES_EXTENSIONS}
+  meilisearch:
+    image: getmeili/meilisearch:v1.16.0
+    restart: on-failure
+    ports:
+      - '${MEILISEARCH_PORT}:7700'
+    volumes:
+      - meilisearch:/meili_data
+    environment:
+      - MEILI_ENV=${MEILISEARCH_ENV}
+      - MEILI_MASTER_KEY=${MEILISEARCH_MASTER_KEY}
+  # rabbitmq:
+  #   image: rabbitmq:4.2.2-management-alpine
+  #   hostname: 'rabbitmq'
+  #   ports:
+  #     - '${RABBITMQ_DASHBOARD_PORT}:15672'
+  #     - '51222:5672'
+  #   expose:
+  #     - '5672'
+  #   volumes:
+  #     - rabbitmq:/var/lib/rabbitmq
+  #     - ./services/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER
+  #     - RABBITMQ_DEFAULT_PASS
+
+volumes:
+  redis:
+    name: ${PROJECT_NAME}_redis
+  postgres:
+    name: ${PROJECT_NAME}_postgres
+  # rabbitmq:
+  #   name: ${PROJECT_NAME}_rabbitmq
